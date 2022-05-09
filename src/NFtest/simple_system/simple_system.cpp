@@ -37,13 +37,13 @@ void NFtest_ss::run()
 	 *
 	 * To run this example, call the NFsim program as follows:
 	 *
-	 *        ./NFsim6 -test simple_system
+	 *        ./NFsim -test simple_system
 	 *
 	 */
 
 	//First we define some parameters for rates and counts
-	int numOfMoleculeY = 3011;
-	int numOfMoleculeX = 6022;
+	int numOfMoleculeY = 2048;//3011;
+	int numOfMoleculeX = 2049;//6022;
 	double dephosRate = 0.2;
 	double kOn = 0.0003;
 	double kOff = 0.2;
@@ -68,26 +68,33 @@ void NFtest_ss::run()
 	//      an example on how this can be done).
 	molY->populateWithDefaultMolecules(numOfMoleculeY);
 	molX->populateWithDefaultMolecules(numOfMoleculeX);
-
+	cout<<"Hi Test1"<<endl;
 
 	//  4)  Create the reactions and add them to the system.  These are calls to specific functions
 	//      below where I set up the details of the reactions.  The numbers are the rates and are in
 	//      arbitrary units here.  In general, the rates should be in units of per second.
 	ReactionClass * x_dephos = createReactionXDephos(molX, dephosRate);
+	cout<<"Hi Test12"<<endl;
 	ReactionClass *rXbindY = createReactionXYbind(molX, molY, kOn);
+	cout<<"Hi Test13"<<endl;
 	ReactionClass *rXunbindY = createReactionXYunbind(molX, molY, kOff);
+	cout<<"Hi Test14"<<endl;
 	ReactionClass *rYphosX = createReactionYphosX(molX, molY, kCat);
 
+    cout<<"Hi Test15"<<endl;
 	s->addReaction(x_dephos);
+	cout<<"Hi Test16"<<endl;
 	s->addReaction(rXbindY);
+	cout<<"Hi Test17"<<endl;
 	s->addReaction(rXunbindY);
+	cout<<"Hi Test18"<<endl;
 	s->addReaction(rYphosX);
-
+	cout<<"Hi Test19"<<endl;
 
 	//  5)  Add the observables that we want to track throughout the simulation.  Again, to
 	//      see how this is done, see the function below.
 	addObs(s, molX, molY);
-
+	cout<<"Hi Test2"<<endl;
 
 
 	//  6)  Prepare the system for simulation (this adds molecules to reactionLists
@@ -99,6 +106,7 @@ void NFtest_ss::run()
 	//  7)  Register the output file name (This will put the file in your working directory)
 	//      Here, you also want to output the header to the file, which is not done automatically
 	//      because you can run a simulation with multiple calls to the sim functions.
+	cout<<endl<<endl<<"Hi Test3"<<endl;
 	s->registerOutputFileLocation("simple_system_output.txt");
 	s->outputAllObservableNames();
 
@@ -117,6 +125,8 @@ void NFtest_ss::run()
 	//s->equilibriate(50,10);
 
 	//There are two ways to run a simulation.  First, you can just call the function sim as in:
+	cout<<endl<<endl<<"Hi Test4"<<endl;
+	//s->setUniversalTraversalLimit(100000);
 	s->sim(500,500);
 
 	//Calling this sim function is the easist way to run a simulation.  The first parameter is the
@@ -312,15 +322,17 @@ ReactionClass * NFtest_ss::createReactionXYunbind(MoleculeType *molX, MoleculeTy
 	//the template for X or the template for Y.  Just pick one!
 	vector <TemplateMolecule *> templates;
 	templates.push_back( yTemp );
-
+    cout<<"Hi Test_1"<<endl;
 	//Again, here we go with the transformationSet.  We only have to specify one unbinding transform.
 	//Either Y unbinds, or X unbinds, but not both.  Here, I arbitrarily choose molecule X to unbind
 	//its binding site at site "y".  The templates take care of the fact that Molecule Y is on the other
 	//end and also has to be updated when this is called.
 	TransformationSet *ts = new TransformationSet(templates);
-	ts->addUnbindingTransform(xTemp,"y",yTemp,"y");
+    cout<<"Hi Test_12"<<endl;
+	ts->addUnbindingTransform(xTemp,"y", yTemp,"x");
+    cout<<"Hi Test_12"<<endl;
 	ts->finalize();
-
+    cout<<"Hi Test_1"<<endl;
 	//Create the reaction in the usual way.
 	ReactionClass *r = new BasicRxnClass("Y_unbind_X",rate,"",ts,molX->getSystem());
 	return r;
@@ -334,7 +346,7 @@ ReactionClass * NFtest_ss::createReactionYphosX(MoleculeType *molX, MoleculeType
 	//like to specify that molecule X must be dephosphorylated for this reaction to fire, so add
 	//that constraint too.
 	TemplateMolecule *xTemp = new TemplateMolecule(molX);
-	xTemp->addComponentConstraint("p",0);
+	xTemp->addComponentConstraint("p","Unphos");
 	TemplateMolecule *yTemp = new TemplateMolecule(molY);
 	TemplateMolecule::bind(xTemp,"y","",yTemp,"x","");
 
